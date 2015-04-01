@@ -1,4 +1,4 @@
-require 'celluloid'
+require "celluloid"
 
 $CELLULOID_MONITORING = true
 
@@ -7,7 +7,7 @@ module Celluloid
     include Celluloid
     include Celluloid::Notifications
 
-    NOTIFICATIONS_TOPIC_BASE = 'celluloid.events.%s'
+    NOTIFICATIONS_TOPIC_BASE = "celluloid.events.%s"
     INITIAL_EVENTS = Queue.new
 
     class << self

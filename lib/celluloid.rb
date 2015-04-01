@@ -1,7 +1,7 @@
-require 'logger'
-require 'thread'
-require 'timeout'
-require 'set'
+require "logger"
+require "thread"
+require "timeout"
+require "set"
 
 $CELLULOID_DEBUG = false
 
@@ -9,7 +9,7 @@ module Celluloid
   # Expose all instance methods as singleton methods
   extend self
 
-  VERSION = '0.16.0'
+  VERSION = "0.16.0"
 
   # Linking times out after 5 seconds
   LINKING_TIMEOUT = 5
@@ -18,7 +18,7 @@ module Celluloid
   BARE_OBJECT_WARNING_MESSAGE = "WARNING: BARE CELLULOID OBJECT "
 
   class << self
-    attr_writer   :actor_system     # Default Actor System
+    attr_writer :actor_system     # Default Actor System
     attr_accessor :logger           # Thread-safe logger class
     attr_accessor :log_actor_crashes
     attr_accessor :task_class       # Default task type to use
@@ -26,9 +26,9 @@ module Celluloid
 
     def actor_system
       if Thread.current.celluloid?
-        Thread.current[:celluloid_actor_system] or raise Error, "actor system not running"
+        Thread.current[:celluloid_actor_system] || fail(Error, "actor system not running")
       else
-        Thread.current[:celluloid_actor_system] || @actor_system or raise Error, "Celluloid is not yet started; use Celluloid.boot"
+        Thread.current[:celluloid_actor_system] || @actor_system || fail(Error, "Celluloid is not yet started; use Celluloid.boot")
       end
     end
 
@@ -38,16 +38,16 @@ module Celluloid
 
       klass.send :extend, Properties
 
-      klass.property :mailbox_class, :default => Celluloid::Mailbox
-      klass.property :proxy_class,   :default => Celluloid::CellProxy
-      klass.property :task_class,    :default => Celluloid.task_class
+      klass.property :mailbox_class, default: Celluloid::Mailbox
+      klass.property :proxy_class,   default: Celluloid::CellProxy
+      klass.property :task_class,    default: Celluloid.task_class
       klass.property :mailbox_size
 
-      klass.property :exclusive_actor, :default => false
-      klass.property :exclusive_methods, :multi => true
+      klass.property :exclusive_actor, default: false
+      klass.property :exclusive_methods, multi: true
       klass.property :execute_block_on_receiver,
-        :default => [:after, :every, :receive],
-        :multi   => true
+                     default: [:after, :every, :receive],
+                     multi: true
 
       klass.property :finalizer
       klass.property :exit_handler_name
@@ -82,7 +82,7 @@ module Celluloid
 
     # Obtain the number of CPUs in the system
     def cores
-     CPUCounter.cores
+      CPUCounter.cores
     end
     alias_method :cpus, :cores
     alias_method :ncpus, :cores
@@ -145,7 +145,7 @@ module Celluloid
         if defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION >= "1.9"
           # workaround for MRI bug losing exit status in at_exit block
           # http://bugs.ruby-lang.org/issues/5218
-          exit_status = $!.status if $!.is_a?(SystemExit)
+          exit_status = $ERROR_INFO.status if $ERROR_INFO.is_a?(SystemExit)
           Celluloid.shutdown
           exit exit_status if exit_status
         else
@@ -177,7 +177,7 @@ module Celluloid
 
     # Create a new actor and link to the current one
     def new_link(*args, &block)
-      raise NotActorError, "can't link outside actor context" unless Celluloid.actor?
+      fail NotActorError, "can't link outside actor context" unless Celluloid.actor?
 
       proxy = Cell.new(allocate, behavior_options, actor_options).proxy
       Actor.link(proxy)
@@ -224,21 +224,21 @@ module Celluloid
     # Configuration options for Actor#new
     def actor_options
       {
-        :actor_system      => actor_system,
-        :mailbox_class     => mailbox_class,
-        :mailbox_size      => mailbox_size,
-        :task_class        => task_class,
-        :exclusive         => exclusive_actor,
+        actor_system: actor_system,
+        mailbox_class: mailbox_class,
+        mailbox_size: mailbox_size,
+        task_class: task_class,
+        exclusive: exclusive_actor
       }
     end
 
     def behavior_options
       {
-        :proxy_class               => proxy_class,
-        :exclusive_methods         => exclusive_methods,
-        :exit_handler_name         => exit_handler_name,
-        :finalizer                 => finalizer,
-        :receiver_block_executions => execute_block_on_receiver,
+        proxy_class: proxy_class,
+        exclusive_methods: exclusive_methods,
+        exit_handler_name: exit_handler_name,
+        finalizer: finalizer,
+        receiver_block_executions: execute_block_on_receiver
       }
     end
 
@@ -263,7 +263,9 @@ module Celluloid
     #     >> actor.bare_object
     #      => #<WARNING: BARE CELLULOID OBJECT (Foo:0x3fefcb77c194)>
     #
-    def bare_object; self; end
+    def bare_object
+      self
+    end
     alias_method :wrapped_object, :bare_object
 
     # Are we being invoked in a different thread from our owner?
@@ -301,7 +303,7 @@ module Celluloid
         str << "#{ivar}=#{instance_variable_get(ivar).inspect} "
       end
 
-      str.sub!(/\s$/, '>')
+      str.sub!(/\s$/, ">")
     end
   end
 
@@ -315,9 +317,9 @@ module Celluloid
     cause = case cause
       when String then RuntimeError.new(cause)
       when Exception then cause
-      else raise TypeError, "Exception object/String expected, but #{cause.class} received"
+      else fail TypeError, "Exception object/String expected, but #{cause.class} received"
     end
-    raise AbortError.new(cause)
+    fail AbortError.new(cause)
   end
 
   # Terminate this actor
@@ -455,64 +457,64 @@ module Celluloid
 end
 
 if defined?(JRUBY_VERSION) && JRUBY_VERSION == "1.7.3"
-  raise "Celluloid is broken on JRuby 1.7.3. Please upgrade to 1.7.4+"
+  fail "Celluloid is broken on JRuby 1.7.3. Please upgrade to 1.7.4+"
 end
 
-require 'celluloid/exceptions'
+require "celluloid/exceptions"
 
-require 'celluloid/calls'
-require 'celluloid/call_chain'
-require 'celluloid/condition'
-require 'celluloid/thread'
-require 'celluloid/core_ext'
-require 'celluloid/cpu_counter'
-require 'celluloid/fiber'
-require 'celluloid/fsm'
-require 'celluloid/internal_pool'
-require 'celluloid/links'
-require 'celluloid/logger'
-require 'celluloid/mailbox'
-require 'celluloid/evented_mailbox'
-require 'celluloid/method'
-require 'celluloid/properties'
-require 'celluloid/handlers'
-require 'celluloid/receivers'
-require 'celluloid/registry'
-require 'celluloid/responses'
-require 'celluloid/signals'
-require 'celluloid/stack_dump'
-require 'celluloid/system_events'
-require 'celluloid/tasks'
-require 'celluloid/task_set'
-require 'celluloid/thread_handle'
-require 'celluloid/uuid'
+require "celluloid/calls"
+require "celluloid/call_chain"
+require "celluloid/condition"
+require "celluloid/thread"
+require "celluloid/core_ext"
+require "celluloid/cpu_counter"
+require "celluloid/fiber"
+require "celluloid/fsm"
+require "celluloid/internal_pool"
+require "celluloid/links"
+require "celluloid/logger"
+require "celluloid/mailbox"
+require "celluloid/evented_mailbox"
+require "celluloid/method"
+require "celluloid/properties"
+require "celluloid/handlers"
+require "celluloid/receivers"
+require "celluloid/registry"
+require "celluloid/responses"
+require "celluloid/signals"
+require "celluloid/stack_dump"
+require "celluloid/system_events"
+require "celluloid/tasks"
+require "celluloid/task_set"
+require "celluloid/thread_handle"
+require "celluloid/uuid"
 
-require 'celluloid/proxies/abstract_proxy'
-require 'celluloid/proxies/sync_proxy'
-require 'celluloid/proxies/cell_proxy'
-require 'celluloid/proxies/actor_proxy'
-require 'celluloid/proxies/async_proxy'
-require 'celluloid/proxies/future_proxy'
-require 'celluloid/proxies/block_proxy'
+require "celluloid/proxies/abstract_proxy"
+require "celluloid/proxies/sync_proxy"
+require "celluloid/proxies/cell_proxy"
+require "celluloid/proxies/actor_proxy"
+require "celluloid/proxies/async_proxy"
+require "celluloid/proxies/future_proxy"
+require "celluloid/proxies/block_proxy"
 
-require 'celluloid/actor'
-require 'celluloid/cell'
-require 'celluloid/future'
-require 'celluloid/actor_system'
-require 'celluloid/pool_manager'
-require 'celluloid/supervision_group'
-require 'celluloid/supervisor'
-require 'celluloid/notifications'
-require 'celluloid/logging'
+require "celluloid/actor"
+require "celluloid/cell"
+require "celluloid/future"
+require "celluloid/actor_system"
+require "celluloid/pool_manager"
+require "celluloid/supervision_group"
+require "celluloid/supervisor"
+require "celluloid/notifications"
+require "celluloid/logging"
 
-require 'celluloid/legacy' unless defined?(CELLULOID_FUTURE)
+require "celluloid/legacy" unless defined?(CELLULOID_FUTURE)
 
 $CELLULOID_MONITORING = false
 
 # Configure default systemwide settings
 Celluloid.task_class = begin
-                         str = ENV['CELLULOID_TASK_CLASS'] || fail(TypeError)
-                         str.split('::').inject(Object) do |mod, class_name|
+                         str = ENV["CELLULOID_TASK_CLASS"] || fail(TypeError)
+                         str.split("::").inject(Object) do |mod, class_name|
                            mod.const_get(class_name)
                          end
                        rescue TypeError

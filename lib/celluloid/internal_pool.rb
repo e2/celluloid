@@ -1,4 +1,4 @@
-require 'thread'
+require "thread"
 
 module Celluloid
   # Maintain a thread pool FOR SPEED!!
@@ -17,16 +17,12 @@ module Celluloid
       @running = true
     end
 
-    def busy_size
-      @busy_size
-    end
+    attr_reader :busy_size
 
-    def idle_size
-      @idle_size
-    end
+    attr_reader :idle_size
 
     def assert_running
-      raise Error, "Thread pool is not running" unless running?
+      fail Error, "Thread pool is not running" unless running?
     end
 
     def assert_inactive
@@ -35,7 +31,7 @@ module Celluloid
       if defined?(JRUBY_VERSION)
         Celluloid.logger.warn message
       else
-        raise Error, message
+        fail Error, message
       end
     end
 
@@ -48,7 +44,7 @@ module Celluloid
     end
 
     def each
-      to_a.each {|thread| yield thread }
+      to_a.each { |thread| yield thread }
     end
 
     def to_a

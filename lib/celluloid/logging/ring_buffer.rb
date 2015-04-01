@@ -28,7 +28,7 @@ module Celluloid
         value
       end
     end
-    alias :<< :push
+    alias_method :<<, :push
 
     def shift
       @mutex.synchronize do
@@ -39,7 +39,7 @@ module Celluloid
     def flush
       values = []
       @mutex.synchronize do
-        while !empty?
+        until empty?
           values << remove_element
         end
       end

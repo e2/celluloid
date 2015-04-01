@@ -1,12 +1,12 @@
-require 'set'
-require 'forwardable'
+require "set"
+require "forwardable"
 
 module Celluloid
   if defined? JRUBY_VERSION
-    require 'jruby/synchronized'
+    require "jruby/synchronized"
 
     class TaskSet
-      extend  Forwardable
+      extend Forwardable
       include JRuby::Synchronized
 
       def_delegators :@tasks, :<<, :delete, :first, :empty?, :to_a

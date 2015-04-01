@@ -1,5 +1,5 @@
 
-require 'timers'
+require "timers"
 
 module Celluloid
   # Actors are Celluloid's concurrency primitive. They're implemented as
@@ -17,14 +17,14 @@ module Celluloid
       # Obtain the current actor
       def current
         actor = Thread.current[:celluloid_actor]
-        raise NotActorError, "not in actor scope" unless actor
+        fail NotActorError, "not in actor scope" unless actor
         actor.behavior_proxy
       end
 
       # Obtain the name of the current actor
       def registered_name
         actor = Thread.current[:celluloid_actor]
-        raise NotActorError, "not in actor scope" unless actor
+        fail NotActorError, "not in actor scope" unless actor
         actor.name
       end
 
@@ -53,13 +53,13 @@ module Celluloid
 
       # Watch for exit events from another actor
       def monitor(actor)
-        raise NotActorError, "can't link outside actor context" unless Celluloid.actor?
+        fail NotActorError, "can't link outside actor context" unless Celluloid.actor?
         Thread.current[:celluloid_actor].linking_request(actor, :link)
       end
 
       # Stop waiting for exit events from another actor
       def unmonitor(actor)
-        raise NotActorError, "can't link outside actor context" unless Celluloid.actor?
+        fail NotActorError, "can't link outside actor context" unless Celluloid.actor?
         Thread.current[:celluloid_actor].linking_request(actor, :unlink)
       end
 
@@ -148,7 +148,7 @@ module Celluloid
       while @running
         begin
           @timers.wait do |interval|
-            interval = 0 if interval and interval < 0
+            interval = 0 if interval && interval < 0
 
             if message = @mailbox.check(interval)
               handle_message(message)
@@ -199,11 +199,11 @@ module Celluloid
           elsif message.is_a? SystemEvent
             # Queue up pending system events to be processed after we've successfully linked
             system_events << message
-          else raise "Unexpected message type: #{message.class}. Expected LinkingResponse, NilClass, SystemEvent."
+          else fail "Unexpected message type: #{message.class}. Expected LinkingResponse, NilClass, SystemEvent."
           end
         end
 
-        raise TimeoutError, "linking timeout of #{LINKING_TIMEOUT} seconds exceeded"
+        fail TimeoutError, "linking timeout of #{LINKING_TIMEOUT} seconds exceeded"
       end
     end
 
@@ -311,7 +311,7 @@ module Celluloid
     end
 
     def default_exit_handler(event)
-      raise event.reason if event.reason
+      fail event.reason if event.reason
     end
 
     # Handle any exceptions that occur within a running actor
@@ -350,13 +350,13 @@ module Celluloid
 
     # Run a method inside a task unless it's exclusive
     def task(task_type, meta = nil)
-      @task_class.new(task_type, meta) {
+      @task_class.new(task_type, meta) do
         if @exclusive
           Celluloid.exclusive { yield }
         else
           yield
         end
-      }.resume
+      end.resume
     end
   end
 end

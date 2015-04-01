@@ -8,21 +8,21 @@
 
 PARALLEL_RUBIES = %w(jruby rbx)
 
-$:.push File.expand_path('../../lib', __FILE__)
-require 'celluloid/autostart'
-require 'digest/sha2'
+$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+require "celluloid/autostart"
+require "digest/sha2"
 
 class Rehasher
   include Celluloid
 
   def rehash(string, rounds)
-    raise ArgumentError, "hurr" unless rounds > 1
+    fail ArgumentError, "hurr" unless rounds > 1
     penultimate = (rounds - 1).times.inject(string) { |s| Digest::SHA512.digest(s) }
     Digest::SHA512.hexdigest(penultimate)
   end
 end
 
-if $0 == __FILE__
+if $PROGRAM_NAME == __FILE__
   pool = Rehasher.pool
   puts "Megahashing!"
   if PARALLEL_RUBIES.include?(RUBY_ENGINE)

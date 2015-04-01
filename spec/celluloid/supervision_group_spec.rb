@@ -4,12 +4,17 @@ RSpec.describe Celluloid::SupervisionGroup, actor_system: :global do
       include Celluloid
 
       attr_reader :args
-      def initialize(*args) @args = args end
-      def running?; :yep; end
+      def initialize(*args)
+        @args = args
+      end
+
+      def running?
+        :yep
+      end
     end
 
     class MyGroup < Celluloid::SupervisionGroup
-      supervise MyActor, :as => :example
+      supervise MyActor, as: :example
     end
   end
 
@@ -46,7 +51,7 @@ RSpec.describe Celluloid::SupervisionGroup, actor_system: :global do
 
     it "supports lazy evaluation" do
       group_klass = Class.new(Celluloid::SupervisionGroup) do
-        supervise MyActor, as: :example, args: ->{ :lazy }
+        supervise MyActor, as: :example, args: -> { :lazy }
       end
       group_klass.run!
       sleep 0.01
@@ -60,13 +65,16 @@ RSpec.describe Celluloid::SupervisionGroup, actor_system: :global do
         include Celluloid
 
         attr_reader :args
-        def initialize *args
+        def initialize(*args)
           @args = *args
         end
-        def running?; :yep; end
+
+        def running?
+          :yep
+        end
       end
       class MyPoolGroup < Celluloid::SupervisionGroup
-        pool MyPoolActor, :as => :example_pool, :args => 'foo', :size => 3
+        pool MyPoolActor, as: :example_pool, args: "foo", size: 3
       end
     end
 
@@ -75,7 +83,7 @@ RSpec.describe Celluloid::SupervisionGroup, actor_system: :global do
       sleep 0.001 # startup time hax
 
       expect(Celluloid::Actor[:example_pool]).to be_running
-      expect(Celluloid::Actor[:example_pool].args).to eq ['foo']
+      expect(Celluloid::Actor[:example_pool].args).to eq ["foo"]
       expect(Celluloid::Actor[:example_pool].size).to be 3
     end
 

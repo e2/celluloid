@@ -1,6 +1,6 @@
-require 'set'
+require "set"
 
-require 'timers'
+require "timers"
 
 module Celluloid
   # Allow methods to directly interact with the actor protocol

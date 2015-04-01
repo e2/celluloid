@@ -40,7 +40,7 @@ RSpec.shared_examples "a Celluloid Task" do
 
   it "raises exceptions outside" do
     task = Celluloid.task_class.new(task_type, {}) do
-      raise "failure"
+      fail "failure"
     end
     expect do
       task.resume

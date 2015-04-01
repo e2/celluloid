@@ -8,7 +8,7 @@ module Celluloid
 
     def initialize(actor, type)
       @actor, @type = actor, type.to_sym
-      raise ArgumentError, "type must be link or unlink" unless [:link, :unlink].include?(@type)
+      fail ArgumentError, "type must be link or unlink" unless [:link, :unlink].include?(@type)
     end
 
     def process(links)
@@ -27,7 +27,7 @@ module Celluloid
 
     def initialize(actor, type)
       @actor, @type = actor, type.to_sym
-      raise ArgumentError, "type must be link or unlink" unless [:link, :unlink].include?(@type)
+      fail ArgumentError, "type must be link or unlink" unless [:link, :unlink].include?(@type)
     end
   end
 

@@ -1,4 +1,4 @@
-require 'securerandom'
+require "securerandom"
 
 module Celluloid
   # Clearly Ruby doesn't have enough UUID libraries

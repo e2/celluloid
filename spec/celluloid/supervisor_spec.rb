@@ -13,7 +13,7 @@ RSpec.describe Celluloid::Supervisor, actor_system: :global do
       case @state
       when :idle
         @state = :working
-      else raise SubordinateDead, "the spec purposely crashed me :("
+      else fail SubordinateDead, "the spec purposely crashed me :("
       end
     end
   end

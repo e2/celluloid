@@ -1,11 +1,11 @@
-require 'coveralls'
+require "coveralls"
 Coveralls.wear!
 
-require 'rubygems'
-require 'bundler/setup'
+require "rubygems"
+require "bundler/setup"
 
 # Require in order, so both CELLULOID_TEST and CELLULOID_DEBUG are true
-require 'celluloid/test'
+require "celluloid/test"
 
 module CelluloidSpecs
   def self.included_module
@@ -19,19 +19,19 @@ end
 
 $CELLULOID_DEBUG = true
 
-require 'celluloid/probe'
+require "celluloid/probe"
 
-logfile = File.open(File.expand_path("../../log/test.log", __FILE__), 'a')
+logfile = File.open(File.expand_path("../../log/test.log", __FILE__), "a")
 logfile.sync = true
 
 Celluloid.logger = Logger.new(logfile)
 
 Celluloid.shutdown_timeout = 1
 
-Dir['./spec/support/*.rb'].map {|f| require f }
+Dir["./spec/support/*.rb"].map { |f| require f }
 
 RSpec.configure do |config|
-  config.filter_run :focus => true
+  config.filter_run focus: true
   config.run_all_when_everything_filtered = true
   config.disable_monkey_patching!
 
@@ -66,12 +66,12 @@ RSpec.configure do |config|
   end
 
   config.around(:each) do |example|
-    config.default_retry_count = example.metadata[:flaky] ? (ENV['CI'] ? 5 : 3) : 1
+    config.default_retry_count = example.metadata[:flaky] ? (ENV["CI"] ? 5 : 3) : 1
     example.run
   end
 
   # Must be *after* the around hook above
-  require 'rspec/retry'
+  require "rspec/retry"
   config.verbose_retry = true
   config.default_sleep_interval = 3
 end

@@ -27,7 +27,9 @@ RSpec.describe Celluloid::Condition, actor_system: :global do
       value
     end
 
-    def waiting?; @waiting end
+    def waiting?
+      @waiting
+    end
   end
 
   let(:actor) { ConditionExample.new }
@@ -63,12 +65,12 @@ RSpec.describe Celluloid::Condition, actor_system: :global do
 
   it "times out inside normal Threads" do
     condition = Celluloid::Condition.new
-    expect { condition.wait(1) }.
-      to raise_error(Celluloid::ConditionError)
+    expect { condition.wait(1) }
+      .to raise_error(Celluloid::ConditionError)
   end
 
   it "times out inside Tasks" do
-    expect { actor.wait_for_condition(1) }.
-      to raise_error(Celluloid::ConditionError)
+    expect { actor.wait_for_condition(1) }
+      .to raise_error(Celluloid::ConditionError)
   end
 end

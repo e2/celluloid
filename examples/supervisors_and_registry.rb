@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-$:.push File.expand_path('../../lib', __FILE__)
-require 'celluloid/autostart'
+$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+require "celluloid/autostart"
 
 class MyActor
   include Celluloid
@@ -83,4 +83,3 @@ rescue Celluloid::DeadActorError
   # catch Celluloid::DeadActorError and automatically restart this actor
   retry
 end
-

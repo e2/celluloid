@@ -1,4 +1,4 @@
-require 'set'
+require "set"
 
 module Celluloid
   # Manages a fixed-size pool of workers
@@ -11,7 +11,7 @@ module Celluloid
 
     def initialize(worker_class, options = {})
       @size = options[:size] || [Celluloid.cores || 2, 2].max
-      raise ArgumentError, "minimum pool size is 2" if @size < 2
+      fail ArgumentError, "minimum pool size is 2" if @size < 2
 
       @worker_class = worker_class
       @args = options[:args] ? Array(options[:args]) : []
@@ -81,9 +81,7 @@ module Celluloid
       _send_ :inspect
     end
 
-    def size
-      @size
-    end
+    attr_reader :size
 
     def size=(new_size)
       new_size = [0, new_size].max

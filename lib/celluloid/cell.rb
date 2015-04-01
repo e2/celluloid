@@ -56,14 +56,14 @@ module Celluloid
         end
       end
 
-      task(:call, meth, :dangerous_suspend => meth == :initialize) {
+      task(:call, meth, dangerous_suspend: meth == :initialize) do
         call.dispatch(@subject)
-      }
+      end
     end
 
-    def task(task_type, method_name = nil, meta = nil, &block)
+    def task(task_type, method_name = nil, meta = nil, &_block)
       meta ||= {}
-      meta.merge!(:method_name => method_name)
+      meta.merge!(method_name: method_name)
       @actor.task(task_type, meta) do
         if @exclusive_methods && method_name && @exclusive_methods.include?(method_name.to_sym)
           Celluloid.exclusive { yield }
@@ -77,7 +77,7 @@ module Celluloid
     def shutdown
       return unless @finalizer && @subject.respond_to?(@finalizer, true)
 
-      task(:finalizer, @finalizer, :dangerous_suspend => true) do
+      task(:finalizer, @finalizer, dangerous_suspend: true) do
         begin
           @subject.__send__(@finalizer)
         rescue => ex

@@ -10,10 +10,12 @@ class TestMachine
     @fired = true
   end
 
-  state :pre_done, :to => :done
+  state :pre_done, to: :done
   state :another, :done
 
-  def fired?; @fired end
+  def fired?
+    @fired
+  end
 end
 
 class CustomDefaultMachine
@@ -66,7 +68,7 @@ RSpec.describe Celluloid::FSM, actor_system: :global do
     end
 
     context "with a delayed transition" do
-      before { subject.transition :done, :delay => delay_interval }
+      before { subject.transition :done, delay: delay_interval }
 
       context "before delay has ended" do
         it "stays unchanged" do
@@ -98,7 +100,7 @@ RSpec.describe Celluloid::FSM, actor_system: :global do
   context "actor is not set" do
     context "transition is delayed" do
       it "raises an unattached error" do
-        expect { subject.transition :another, :delay => 100 } \
+        expect { subject.transition :another, delay: 100 } \
           .to raise_error(Celluloid::FSM::UnattachedError)
       end
     end

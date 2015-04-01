@@ -26,7 +26,7 @@ module Celluloid
         ex.backtrace.concat(caller)
       end
 
-      raise ex
+      fail ex
     end
   end
 

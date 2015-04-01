@@ -35,25 +35,25 @@ module Celluloid
       # Register an actor class or a sub-group to be launched and supervised
       def supervise(klass, *args, &block)
         blocks << lambda do |group|
-          group.add(klass, prepare_options(args, :block => block))
+          group.add(klass, prepare_options(args, block: block))
         end
       end
 
       def supervise_as(name, klass, *args, &block)
         blocks << lambda do |group|
-          group.add(klass, prepare_options(args, :block => block, :as => name))
+          group.add(klass, prepare_options(args, block: block, as: name))
         end
       end
 
       # Register a pool of actors to be launched on group startup
       def pool(klass, *args, &block)
         blocks << lambda do |group|
-          group.pool(klass, prepare_options(args, :block => block))
+          group.pool(klass, prepare_options(args, block: block))
         end
       end
 
       def prepare_options(args, options = {})
-        ( ( args.length == 1 and args[0].is_a? Hash ) ? args[0] : { :args => args } ).merge( options )
+        ((args.length == 1 && args[0].is_a?(Hash)) ? args[0] : { args: args }).merge(options)
       end
     end
 
@@ -70,15 +70,15 @@ module Celluloid
     execute_block_on_receiver :initialize, :supervise, :supervise_as
 
     def supervise(klass, *args, &block)
-      add(klass, self.class.prepare_options(args, :block => block))
+      add(klass, self.class.prepare_options(args, block: block))
     end
 
     def supervise_as(name, klass, *args, &block)
-      add(klass, self.class.prepare_options(args, :block => block, :as => name))
+      add(klass, self.class.prepare_options(args, block: block, as: name))
     end
 
     def pool(klass, options = {})
-      options[:method] = 'pool_link'
+      options[:method] = "pool_link"
       add(klass, options)
     end
 
@@ -101,7 +101,7 @@ module Celluloid
       member = @members.find do |_member|
         _member.actor == actor
       end
-      raise "a group member went missing. This shouldn't be!" unless member
+      fail "a group member went missing. This shouldn't be!" unless member
 
       if reason
         member.restart
@@ -120,14 +120,14 @@ module Celluloid
         @klass = klass
 
         # Stringify keys :/
-        options = options.each_with_object({}) { |(k,v), h| h[k.to_s] = v }
+        options = options.each_with_object({}) { |(k, v), h| h[k.to_s] = v }
 
-        @name = options['as']
-        @block = options['block']
-        @args = prepare_args(options['args'])
-        @method = options['method'] || 'new_link'
-        @pool = @method == 'pool_link'
-        @pool_size = options['size'] if @pool
+        @name = options["as"]
+        @block = options["block"]
+        @args = prepare_args(options["args"])
+        @method = options["method"] || "new_link"
+        @pool = @method == "pool_link"
+        @pool_size = options["size"] if @pool
 
         start
       end
@@ -137,7 +137,7 @@ module Celluloid
         # when it is a pool, then we don't splat the args
         # and we need to extract the pool size if set
         if @pool
-          options = {:args => @args}
+          options = { args: @args }
           options[:size] = @pool_size if @pool_size
           @args = [options]
         end

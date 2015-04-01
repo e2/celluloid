@@ -44,15 +44,15 @@ module Celluloid
       def state(*args, &block)
         if args.last.is_a? Hash
           # Stringify keys :/
-          options = args.pop.each_with_object({}) { |(k,v), h| h[k.to_s] = v }
+          options = args.pop.each_with_object({}) { |(k, v), h| h[k.to_s] = v }
         else
           options = {}
         end
 
         args.each do |name|
           name = name.to_sym
-          default_state name if options['default']
-          states[name] = State.new(name, options['to'], &block)
+          default_state name if options["default"]
+          states[name] = State.new(name, options["to"], &block)
         end
       end
     end
@@ -107,16 +107,16 @@ module Celluloid
 
       return if current_state_name == state_name
 
-      if current_state and not current_state.valid_transition? state_name
+      if current_state and !current_state.valid_transition? state_name
         valid = current_state.transitions.map(&:to_s).join(", ")
-        raise ArgumentError, "#{self.class} can't change state from '#{@state}' to '#{state_name}', only to: #{valid}"
+        fail ArgumentError, "#{self.class} can't change state from '#{@state}' to '#{state_name}', only to: #{valid}"
       end
 
       new_state = states[state_name]
 
       unless new_state
         return if state_name == default_state
-        raise ArgumentError, "invalid state for #{self.class}: #{state_name}"
+        fail ArgumentError, "invalid state for #{self.class}: #{state_name}"
       end
 
       new_state
@@ -140,12 +140,12 @@ module Celluloid
     end
 
     def current_state_name
-      current_state && current_state.name || ''
+      current_state && current_state.name || ""
     end
 
     def handle_delayed_transitions(new_state, delay)
       if delay
-        raise UnattachedError, "can't delay unless attached" unless @actor
+        fail UnattachedError, "can't delay unless attached" unless @actor
         @delayed_transition.cancel if @delayed_transition
 
         @delayed_transition = @actor.after(delay) do
@@ -155,7 +155,7 @@ module Celluloid
         return @delayed_transition
       end
 
-      return unless defined?(@delayed_transition) and @delayed_transition
+      return unless defined?(@delayed_transition) && @delayed_transition
       @delayed_transition.cancel
       @delayed_transition = nil
     end

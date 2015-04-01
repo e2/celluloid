@@ -28,7 +28,7 @@ RSpec.describe Celluloid::InternalPool do
 
         queue = Queue.new
 
-        subject.get { raise exception_class.new("Error") }
+        subject.get { fail exception_class.new("Error") }
 
         expect(subject.idle_size).to be_zero
         expect(subject.busy_size).to eq 1
@@ -45,7 +45,7 @@ RSpec.describe Celluloid::InternalPool do
   it "cleans thread locals from old threads" do
     thread = subject.get { Thread.current[:foo] = :bar }
 
-    sleep 0.01 #hax
+    sleep 0.01 # hax
     expect(thread[:foo]).to be_nil
   end
 

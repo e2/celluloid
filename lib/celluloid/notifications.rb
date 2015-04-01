@@ -1,7 +1,7 @@
 module Celluloid
   module Notifications
     def self.notifier
-      Actor[:notifications_fanout] or raise DeadActorError, "notifications fanout actor not running"
+      Actor[:notifications_fanout] || fail(DeadActorError, "notifications fanout actor not running")
     end
 
     def publish(pattern, *args)
@@ -52,7 +52,7 @@ module Celluloid
         listeners_for(pattern).any?
       end
 
-      def prune(actor, reason=nil)
+      def prune(actor, _reason = nil)
         @subscribers.reject! { |s| s.actor == actor }
         @listeners_for.clear
       end

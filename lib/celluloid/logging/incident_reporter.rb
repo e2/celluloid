@@ -1,4 +1,4 @@
-require 'logger'
+require "logger"
 module Celluloid
   # Subscribes to log incident topics to report on them.
   class IncidentReporter
@@ -7,7 +7,7 @@ module Celluloid
 
     # get the time from the event
     class Formatter < ::Logger::Formatter
-      def call(severity, time, progname, msg)
+      def call(severity, _time, progname, msg)
         super(severity, msg.time, progname, msg.message)
       end
     end
@@ -19,7 +19,7 @@ module Celluloid
       @silenced = false
     end
 
-    def report(topic, incident)
+    def report(_topic, incident)
       return if @silenced
 
       header = "INCIDENT"

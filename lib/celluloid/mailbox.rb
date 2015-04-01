@@ -1,4 +1,4 @@
-require 'thread'
+require "thread"
 
 module Celluloid
   class MailboxDead < Celluloid::Error; end # you can't receive from the dead
@@ -52,7 +52,7 @@ module Celluloid
 
       @mutex.lock
       begin
-        raise MailboxDead, "attempted to receive from a dead mailbox" if @dead
+        fail MailboxDead, "attempted to receive from a dead mailbox" if @dead
 
         Timers::Wait.for(timeout) do |remaining|
           message = next_message(&block)
@@ -64,25 +64,25 @@ module Celluloid
       ensure
         @mutex.unlock rescue nil
       end
-      
-      return message
+
+      message
     end
 
     # Receive a letter from the mailbox. Guaranteed to return a message. If
     # timeout is exceeded, raise a TimeoutError.
     def receive(timeout = nil, &block)
-      Timers::Wait.for(timeout) do |remaining|
+      Timers::Wait.for(timeout) do |_remaining|
         if message = check(timeout, &block)
           return message
         end
       end
-      
-      raise TimeoutError.new("receive timeout exceeded")
+
+      fail TimeoutError.new("receive timeout exceeded")
     end
 
     # Shut down this mailbox and clean up its contents
     def shutdown
-      raise MailboxDead, "mailbox already shutdown" if @dead
+      fail MailboxDead, "mailbox already shutdown" if @dead
 
       @mutex.lock
       begin

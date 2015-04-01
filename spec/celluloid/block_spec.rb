@@ -10,9 +10,9 @@ RSpec.describe "Blocks", actor_system: :global do
     def ask_for_something(other)
       sender_actor = current_actor
       $data << [:outside, @name, current_actor.name]
-      other.do_something_and_callback do |value|
+      other.do_something_and_callback do |_value|
         $data << [:yielded, @name, current_actor.name]
-        $data << self.receive_result(:self)
+        $data << receive_result(:self)
         $data << current_actor.receive_result(:current_actor)
         $data << sender_actor.receive_result(:sender)
         "somevalue"
@@ -44,7 +44,7 @@ RSpec.describe "Blocks", actor_system: :global do
       [:self, "one", "one"],
       [:current_actor, "one", "one"],
       [:sender, "one", "one"],
-      "somevalue",
+      "somevalue"
     ]
 
     expect($data).to eq(expected)

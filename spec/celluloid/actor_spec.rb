@@ -241,12 +241,12 @@ RSpec.describe Celluloid, actor_system: :global do
     actor.terminate
     expect(actor.inspect).to match(/Celluloid::CellProxy\(/)
     expect(actor.inspect).to match(/#{actor_class}/)
-    expect(actor.inspect).to include('dead')
+    expect(actor.inspect).to include("dead")
   end
 
   it "reports private methods properly when dead" do
     actor.terminate
-    expect{ actor.private_methods }.not_to raise_error
+    expect { actor.private_methods }.not_to raise_error
   end
 
   context "with actors referencing each other" do
@@ -284,7 +284,7 @@ RSpec.describe Celluloid, actor_system: :global do
   end
 
   it "can override #send" do
-    expect(actor.send('foo')).to eq('oof')
+    expect(actor.send("foo")).to eq("oof")
   end
 
   context "when executing under JRuby" do
@@ -338,7 +338,7 @@ RSpec.describe Celluloid, actor_system: :global do
           include CelluloidSpecs.included_module
 
           define_method(:receiver_method) do
-            raise ExampleCrash, "the spec purposely crashed me :("
+            fail ExampleCrash, "the spec purposely crashed me :("
           end
         end
 
@@ -350,7 +350,7 @@ RSpec.describe Celluloid, actor_system: :global do
           end
         end
 
-        ex = example_caller.new.sender_method rescue $!
+        ex = example_caller.new.sender_method rescue $ERROR_INFO
 
         expect(ex).to be_a ExampleCrash
         expect(ex.backtrace.grep(/`sender_method'/)).to be_truthy
@@ -471,7 +471,7 @@ RSpec.describe Celluloid, actor_system: :global do
     end
   end
 
-  describe '#current_actor' do
+  describe "#current_actor" do
     context "when called on an actor" do
       let(:actor) { actor_class.new "Roger Daltrey" }
 
@@ -501,9 +501,11 @@ RSpec.describe Celluloid, actor_system: :global do
           @subordinate_lambasted = false
         end
 
-        def subordinate_lambasted?; @subordinate_lambasted; end
+        def subordinate_lambasted?
+          @subordinate_lambasted
+        end
 
-        def lambaste_subordinate(actor, reason)
+        def lambaste_subordinate(_actor, _reason)
           @subordinate_lambasted = true
         end
       end
@@ -512,9 +514,9 @@ RSpec.describe Celluloid, actor_system: :global do
     it "links to other actors" do
       @kevin.link @charlie
       expect(@kevin.monitoring?(@charlie)).to be_truthy
-      expect(@kevin.linked_to?(@charlie)).to  be_truthy
+      expect(@kevin.linked_to?(@charlie)).to be_truthy
       expect(@charlie.monitoring?(@kevin)).to be_truthy
-      expect(@charlie.linked_to?(@kevin)).to  be_truthy
+      expect(@charlie.linked_to?(@kevin)).to be_truthy
     end
 
     it "unlinks from other actors" do
@@ -522,18 +524,18 @@ RSpec.describe Celluloid, actor_system: :global do
       @kevin.unlink @charlie
 
       expect(@kevin.monitoring?(@charlie)).to be_falsey
-      expect(@kevin.linked_to?(@charlie)).to  be_falsey
+      expect(@kevin.linked_to?(@charlie)).to be_falsey
       expect(@charlie.monitoring?(@kevin)).to be_falsey
-      expect(@charlie.linked_to?(@kevin)).to  be_falsey
+      expect(@charlie.linked_to?(@kevin)).to be_falsey
     end
 
     it "monitors other actors unidirectionally" do
       @kevin.monitor @charlie
 
       expect(@kevin.monitoring?(@charlie)).to be_truthy
-      expect(@kevin.linked_to?(@charlie)).to  be_falsey
+      expect(@kevin.linked_to?(@charlie)).to be_falsey
       expect(@charlie.monitoring?(@kevin)).to be_falsey
-      expect(@charlie.linked_to?(@kevin)).to  be_falsey
+      expect(@charlie.linked_to?(@kevin)).to be_falsey
     end
 
     it "unmonitors other actors" do
@@ -541,9 +543,9 @@ RSpec.describe Celluloid, actor_system: :global do
       @kevin.unmonitor @charlie
 
       expect(@kevin.monitoring?(@charlie)).to be_falsey
-      expect(@kevin.linked_to?(@charlie)).to  be_falsey
+      expect(@kevin.linked_to?(@charlie)).to be_falsey
       expect(@charlie.monitoring?(@kevin)).to be_falsey
-      expect(@charlie.linked_to?(@kevin)).to  be_falsey
+      expect(@charlie.linked_to?(@kevin)).to be_falsey
     end
 
     it "traps exit messages from other actors" do
@@ -595,7 +597,7 @@ RSpec.describe Celluloid, actor_system: :global do
         end
 
         def wait_for_signal
-          raise "already signaled" if @signaled
+          fail "already signaled" if @signaled
 
           @waiting = true
           value = wait :ponycopter
@@ -609,8 +611,13 @@ RSpec.describe Celluloid, actor_system: :global do
           signal :ponycopter, value
         end
 
-        def waiting?; @waiting end
-        def signaled?; @signaled end
+        def waiting?
+          @waiting
+        end
+
+        def signaled?
+          @signaled
+        end
       end
     end
 
@@ -721,11 +728,11 @@ RSpec.describe Celluloid, actor_system: :global do
 
         def eat_donuts
           sleep CelluloidSpecs::TIMER_QUANTUM
-          @tasks << 'donuts'
+          @tasks << "donuts"
         end
 
         def drink_coffee
-          @tasks << 'coffee'
+          @tasks << "coffee"
         end
       end
     end
@@ -740,7 +747,7 @@ RSpec.describe Celluloid, actor_system: :global do
       end
 
       it "executes in an exclusive order" do
-        expect(actor.tasks).to eq(['donuts', 'coffee'])
+        expect(actor.tasks).to eq(%w(donuts coffee))
       end
     end
   end
@@ -797,7 +804,9 @@ RSpec.describe Celluloid, actor_system: :global do
           @sleeping = false
         end
 
-        def sleeping?; @sleeping end
+        def sleeping?
+          @sleeping
+        end
 
         def fire_after(n)
           after(n) { @fired = true }
@@ -808,8 +817,11 @@ RSpec.describe Celluloid, actor_system: :global do
           every(n) { @fired += 1 }
         end
 
-        def fired?; !!@fired end
-        def fired; @fired end
+        def fired?
+          !!@fired
+        end
+
+        attr_reader :fired
       end.new
     end
 
@@ -947,7 +959,7 @@ RSpec.describe Celluloid, actor_system: :global do
     end
   end
 
-  context '#proxy_class' do
+  context "#proxy_class" do
     subject do
       Class.new do
         include CelluloidSpecs.included_module
@@ -963,7 +975,7 @@ RSpec.describe Celluloid, actor_system: :global do
     end
 
     it "uses user-specified proxy" do
-      expect{subject.new.subclass_proxy?}.to_not raise_error
+      expect { subject.new.subclass_proxy? }.to_not raise_error
     end
 
     it "retains custom proxy when subclassed" do

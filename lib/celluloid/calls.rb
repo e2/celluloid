@@ -8,7 +8,7 @@ module Celluloid
       if block
         if Celluloid.exclusive?
           # FIXME: nicer exception
-          raise "Cannot execute blocks on sender in exclusive mode"
+          fail "Cannot execute blocks on sender in exclusive mode"
         end
         @block = BlockProxy.new(self, Celluloid.mailbox, block)
       else
@@ -42,10 +42,10 @@ module Celluloid
       arity = meth.arity
 
       if arity >= 0
-        raise ArgumentError, "wrong number of arguments (#{@arguments.size} for #{arity})" if @arguments.size != arity
+        fail ArgumentError, "wrong number of arguments (#{@arguments.size} for #{arity})" if @arguments.size != arity
       elsif arity < -1
         mandatory_args = -arity - 1
-        raise ArgumentError, "wrong number of arguments (#{@arguments.size} for #{mandatory_args}+)" if arguments.size < mandatory_args
+        fail ArgumentError, "wrong number of arguments (#{@arguments.size} for #{mandatory_args}+)" if arguments.size < mandatory_args
       end
     rescue => ex
       raise AbortError.new(ex)
@@ -111,7 +111,7 @@ module Celluloid
     def wait
       loop do
         message = Celluloid.mailbox.receive do |msg|
-          msg.respond_to?(:call) and msg.call == self
+          msg.respond_to?(:call) && msg.call == self
         end
 
         if message.is_a?(SystemEvent)
@@ -137,7 +137,7 @@ module Celluloid
       super(obj)
     rescue AbortError => ex
       # Swallow aborted async calls, as they indicate the sender made a mistake
-      Logger.debug("#{obj.class}: async call `#@method` aborted!\n#{Logger.format_exception(ex.cause)}")
+      Logger.debug("#{obj.class}: async call `#{@method}` aborted!\n#{Logger.format_exception(ex.cause)}")
     ensure
       CallChain.current_id = nil
     end

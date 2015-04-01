@@ -1,4 +1,4 @@
-require 'thread'
+require "thread"
 
 module Celluloid
   # The Registry allows us to refer to specific actors by human-meaningful names
@@ -12,7 +12,7 @@ module Celluloid
     def []=(name, actor)
       actor_singleton = class << actor; self; end
       unless actor_singleton.ancestors.include? AbstractProxy
-        raise TypeError, "not an actor"
+        fail TypeError, "not an actor"
       end
 
       @registry_lock.synchronize do

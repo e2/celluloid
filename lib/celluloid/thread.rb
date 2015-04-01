@@ -1,4 +1,4 @@
-require 'celluloid/fiber'
+require "celluloid/fiber"
 
 module Celluloid
   class Thread < ::Thread
