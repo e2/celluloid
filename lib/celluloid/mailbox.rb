@@ -57,9 +57,16 @@ module Celluloid
         Timers::Wait.for(timeout) do |remaining|
           message = next_message(&block)
 
-          break message if message
+          unless message
+            # Try and wait for next message
+            @condition.wait(@mutex, remaining)
 
-          @condition.wait(@mutex, remaining)
+            # We got a signal here, so there's a new message still within the
+            # timeout
+            message = next_message(&block)
+          end
+
+          break message if message
         end
       ensure
         @mutex.unlock rescue nil
