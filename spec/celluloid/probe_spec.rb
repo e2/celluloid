@@ -44,7 +44,7 @@ RSpec.describe "Probe", actor_system: :global do
   let(:queue) { Queue.new }
 
   describe 'on boot' do
-    it 'should capture system actor spawn', flaky: true do
+    it 'should capture system actor spawn' do
       TestProbeClient.new(queue)
       Celluloid::Probe.run
       create_events = []
@@ -75,14 +75,14 @@ RSpec.describe "Probe", actor_system: :global do
   end
 
   describe 'after boot' do
-    it 'should send a notification when an actor is spawned', flaky: true do
+    it 'should send a notification when an actor is spawned' do
       TestProbeClient.new(queue)
       Celluloid::Probe.run
       a = DummyActor.new
       expect(wait_for_match(queue, 'celluloid.events.actor_created', a)).to be
     end
 
-    it 'should send a notification when an actor is named', flaky: true  do
+    it 'should send a notification when an actor is named'  do
       TestProbeClient.new(queue)
       Celluloid::Probe.run
       a = DummyActor.new
