@@ -21,14 +21,6 @@ module Specs
     @env ||= Nenv('celluloid_specs')
   end
 
-  def self.retry_count_for(metadata)
-    Integer(ENV['CELLULOID_SPECS_RETRY_COUNT'])
-  rescue
-    # TODO: remove the bypass_flaky altogether at some point
-    from_env = Specs.env.bypass_flaky? ? 0 : 1
-    metadata[:flaky] ? ( Nenv.ci? ? 5 : from_env) : 1
-  end
-
   class << self
     def log
       # Setup ENV variable handling with sane defaults
@@ -205,7 +197,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.filter_gems_from_backtrace(*%w(rspec-expectations rspec-core rspec-mocks rspec-retry rspec-log_split rubysl-thread rubysl-timeout))
+  config.filter_gems_from_backtrace(*%w(rspec-expectations rspec-core rspec-mocks rspec-log_split rubysl-thread rubysl-timeout))
 
   config.mock_with :rspec do |mocks|
     mocks.verify_doubled_constant_names = true
@@ -216,12 +208,6 @@ RSpec.configure do |config|
     # Needed because some specs mock/stub/expect on the logger
     Celluloid.logger = Specs.logger
 
-    config.default_retry_count = Specs.retry_count_for(example.metadata)
     example.run
   end
-
-  # Must be *after* the around hook above
-  require 'rspec/retry'
-  config.verbose_retry = true
-  config.default_sleep_interval = 3
 end
